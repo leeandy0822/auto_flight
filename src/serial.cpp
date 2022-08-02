@@ -7,8 +7,9 @@
 #include <inttypes.h>
 #include <string>
 #include "ros/ros.h"
-
+// for check
 #define NCRL_LINK_CHECKSUM_INIT_VAL 19
+// pc -> px4
 #define NCRL_LINK_SERIAL_MSG_SIZE 22
 #define DRONE_ID 1
 
@@ -89,7 +90,6 @@ static uint8_t generate_ncrl_link_checksum_byte(uint8_t *payload, int payload_co
 	int i;
 	for(i = 0; i < payload_count; i++)
 		result ^= payload[i];
-
 	return result;
 }
 
@@ -124,8 +124,7 @@ void send_pose_to_serial(char mode, char aux, float data1,
 	msg_pos += sizeof(float);
 	memcpy(msg_buf + msg_pos, &data4, sizeof(float));
 	msg_pos += sizeof(float);
-
-
+	// end byte
     msg_buf[msg_pos] = '+'; //end byte
 	msg_pos += sizeof(uint8_t);
 
