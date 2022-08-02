@@ -1,8 +1,9 @@
 #ifndef __MAIN_THREAD__
 #define __MAIN_THREAD__
 
-#define IMU_SERIAL_MSG_SIZE 27 
+#define IMU_SERIAL_MSG_SIZE 21
 #define IMU_CHECKSUM_INIT_VAL 19
+#define FSM_MSG_SIZE 21
 
 #define MASS 1.39f
 #define GRAVITY 9.8f

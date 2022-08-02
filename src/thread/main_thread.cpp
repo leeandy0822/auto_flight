@@ -12,7 +12,7 @@
 imu_t imu;
 uint8_t rc_ch7;
 
-using std;
+using namespace std;
 
 uint8_t generate_imu_checksum_byte(uint8_t *payload, int payload_count){
 	uint8_t result = IMU_CHECKSUM_INIT_VAL;
@@ -27,39 +27,39 @@ uint8_t generate_imu_checksum_byte(uint8_t *payload, int payload_count){
 int imu_decode(uint8_t *buf){
 	static float x_array_uart[100];
 	uint8_t recv_checksum = buf[1];
-	uint8_t checksum = generate_imu_checksum_byte(&buf[3], IMU_SERIAL_MSG_SIZE - 3);
+	uint8_t checksum = generate_imu_checksum_byte(&buf[3], FSM_MSG_SIZE - 3);
 	if(checksum != recv_checksum) {
 		return 1; //error detected
 	}
-	float roll, pitch, yaw, throttle;
-    
-	memcpy(&roll, &buf[2], sizeof(float)); //in ned coordinate system
-	memcpy(&pitch, &buf[6], sizeof(float));
-	memcpy(&yaw, &buf[10], sizeof(float));
-
+	float data1, data2, data3, data4;
+	char mode;
+	char aux;
+    memcpy(&mode, &buf[2], sizeof(char));
+	memcpy(&aux, &buf[3], sizeof(float)); //in ned coordinate system
+	memcpy(&data1, &buf[4], sizeof(float)); //in ned coordinate system
+	memcpy(&data2, &buf[8], sizeof(float));
+	memcpy(&data3, &buf[12], sizeof(float));
 	/* swap the order of quaternion to make the frame consistent with ahrs' rotation order */
-	memcpy(&throttle, &buf[14], sizeof(float));
-	memcpy(&rc_ch7, &buf[18], sizeof(int));
+	memcpy(&data4, &buf[16], sizeof(float));
 	//memcpy(&imu.gyrop[0], &buf[22], sizeof(float));
-	
-	cout << roll <<endl;
-
-
-
+	cout << mode << endl;
+	cout << aux << endl;
+	cout << data1 << endl;
+	cout << data4 << endl;
 	return 0;
 }
 
 void imu_buf_push(uint8_t c){
-	if(imu.buf_pos >= IMU_SERIAL_MSG_SIZE) {
+	if(imu.buf_pos >= FSM_MSG_SIZE) {
 		/* drop the oldest data and shift the rest to left */
 		int i;
-		for(i = 1; i < IMU_SERIAL_MSG_SIZE; i++) {
+		for(i = 1; i < FSM_MSG_SIZE; i++) {
 			imu.buf[i - 1] = imu.buf[i];
 		}
 
 		/* save new byte to the last array element */
-		imu.buf[IMU_SERIAL_MSG_SIZE - 1] = c;
-		imu.buf_pos = IMU_SERIAL_MSG_SIZE;
+		imu.buf[FSM_MSG_SIZE - 1] = c;
+		imu.buf_pos = FSM_MSG_SIZE;
 	} else {
 		/* append new byte if the array boundary is not yet reached */
 		imu.buf[imu.buf_pos] = c;
@@ -82,12 +82,12 @@ int uart_thread_entry(){
 		
 		if(serial_getc(&c) != -1) {
 			imu_buf_push(c); 
-			if(imu.buf[0]=='@' && imu.buf[IMU_SERIAL_MSG_SIZE-1] == '+'){
+			if(imu.buf[0]=='@' && imu.buf[FSM_MSG_SIZE-1] == '+'){
 				if(imu_decode(imu.buf)==0){
 
 					loop_rate_.sleep();
 
-					send_pose_to_serial(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0);
+					send_pose_to_serial('c','d',1,2,3,4);
 						
 					
 				}
