@@ -8,6 +8,7 @@
 #include <string>
 #include <iterator>
 #include "main_thread.h"
+#include "auto_flight/ncrl_link.h"
 
 ncrl_link_t ncrl_link;
 uint8_t rc_ch7;
@@ -36,7 +37,7 @@ int ncrl_link_decode(uint8_t *buf){
 	memcpy(&ncrl_link.data3, &buf[12], sizeof(float));
 	/* swap the order of quaternion to make the frame consistent with ahrs' rotation order */
 	memcpy(&ncrl_link.data4, &buf[16], sizeof(float));
-	cout << ncrl_link.mode << endl;
+	cout << (int)ncrl_link.mode << endl;
 	cout << ncrl_link.aux_info << endl;
 	cout << ncrl_link.data1 << endl;
 	cout << ncrl_link.data4 << endl;
@@ -80,7 +81,7 @@ int uart_thread_entry(){
 				if(ncrl_link_decode(ncrl_link.buf)==0){
 					loop_rate_.sleep();
 					// mode, aux_info, data1, data2, data3, data4
-					send_pose_to_serial('u','r',0.9,2.22,3.5,90);
+					send_pose_to_serial(0x02,'r',0.9,2.22,3.5,90);
 				}
 			}
 		}
