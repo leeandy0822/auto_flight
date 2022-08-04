@@ -1,6 +1,7 @@
 #ifndef __MAIN_THREAD__
 #define __MAIN_THREAD__
 
+#include "auto_flight/ncrl_link.h"
 // pc -> px4
 #define NCRL_LINK_SERIAL_MSG_SIZE 22
 // for check
@@ -22,25 +23,48 @@ typedef struct {
 
 	double deviation_acc;	
 
-	uint8_t buf[];
+
 	char mode;
 	char aux_info;
 	float data1;
 	float data2;
 	float data3;
 	float data4;
-	
-} ncrl_link_t ;
 
+	uint8_t buf[44];
+
+
+} ncrl_link_t;
+
+class NCRL_LINK{
+
+private :
+
+	ros::NodeHandle n;
+	ros::Publisher pub;
+	ros::Subscriber sub;
+
+public:
+
+	NCRL_LINK();
+
+	uint8_t generate_ncrl_link_checksum_byte(uint8_t *, int);
+
+	int ncrl_link_decode(uint8_t *);
+
+	void ncrl_link_buf_push(uint8_t);
+
+	void callback(const auto_flight::ncrl_link::ConstPtr& msg);
+
+	void publisher();
+
+	ncrl_link_t rx_data;
+	ncrl_link_t tx_data;
+
+};
 
 int uart_thread_entry();
 
 int ros_thread_entry();
-
-uint8_t generate_ncrl_link_checksum_byte(uint8_t *, int);
-
-int ncrl_link_decode(uint8_t *);
-
-void ncrl_link_buf_push(uint8_t);
 
 #endif

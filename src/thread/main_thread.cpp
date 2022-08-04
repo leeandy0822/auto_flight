@@ -7,15 +7,40 @@
 #include <vector>
 #include <string>
 #include <iterator>
-#include "main_thread.h"
-#include "auto_flight/ncrl_link.h"
 
-ncrl_link_t ncrl_link;
-uint8_t rc_ch7;
+#include "main_thread.h"
+
 
 using namespace std;
 
-uint8_t generate_ncrl_link_checksum_byte(uint8_t *payload, int payload_count){
+NCRL_LINK::NCRL_LINK(){
+	rx_data.buf_pos = 0;
+	pub = n.advertise<auto_flight::ncrl_link>("RX_DATA",1);
+	sub = n.subscribe<auto_flight::ncrl_link>("TX_DATA",1,&NCRL_LINK::callback,this);
+	tx_data.mode = 'a';
+	tx_data.aux_info = 'z';
+	tx_data.data1 = 0.001;
+	tx_data.data2 = 0.001;
+	tx_data.data3 = 0.001;	
+}
+void NCRL_LINK::callback(const auto_flight::ncrl_link::ConstPtr& msg){
+	tx_data.mode = msg->mode[0];
+	tx_data.aux_info = msg->aux_info[0];
+	tx_data.data1 = msg->data1;
+	tx_data.data2 = msg->data2;
+	tx_data.data3 = msg->data3;	
+}
+void NCRL_LINK::publisher(){
+	auto_flight::ncrl_link pub_data;
+	pub_data.mode = rx_data.mode;
+	pub_data.aux_info = rx_data.aux_info;
+	pub_data.data1 = rx_data.data1;
+	pub_data.data2 = rx_data.data2;
+	pub_data.data3 = rx_data.data3;	
+	pub.publish(pub_data);
+}
+
+uint8_t NCRL_LINK::generate_ncrl_link_checksum_byte(uint8_t *payload, int payload_count){
 	uint8_t result = NCRL_LINK_CHECKSUM_INIT_VAL;
 	int i;
 	for(i = 0; i < payload_count; i++)
@@ -24,68 +49,74 @@ uint8_t generate_ncrl_link_checksum_byte(uint8_t *payload, int payload_count){
 	return result;
 }
 
-int ncrl_link_decode(uint8_t *buf){
+int NCRL_LINK::ncrl_link_decode(uint8_t *buf){
 	uint8_t recv_checksum = buf[1];
 	uint8_t checksum = generate_ncrl_link_checksum_byte(&buf[3], NCRL_LINK_MSG_SIZE - 3);
 	if(checksum != recv_checksum) {
 		return 1; //error detected
 	}
-    memcpy(&ncrl_link.mode, &buf[2], sizeof(char));
-	memcpy(&ncrl_link.aux_info, &buf[3], sizeof(char)); //in ned coordinate system
-	memcpy(&ncrl_link.data1, &buf[4], sizeof(float)); //in ned coordinate system
-	memcpy(&ncrl_link.data2, &buf[8], sizeof(float));
-	memcpy(&ncrl_link.data3, &buf[12], sizeof(float));
+    memcpy(&rx_data.mode, &buf[2], sizeof(char));
+	memcpy(&rx_data.aux_info, &buf[3], sizeof(char)); //in ned coordinate system
+	memcpy(&rx_data.data1, &buf[4], sizeof(float)); //in ned coordinate system
+	memcpy(&rx_data.data2, &buf[8], sizeof(float));
+	memcpy(&rx_data.data3, &buf[12], sizeof(float));
 	/* swap the order of quaternion to make the frame consistent with ahrs' rotation order */
-	memcpy(&ncrl_link.data4, &buf[16], sizeof(float));
-	cout << (int)ncrl_link.mode << endl;
-	cout << ncrl_link.aux_info << endl;
-	cout << ncrl_link.data1 << endl;
-	cout << ncrl_link.data4 << endl;
+	memcpy(&rx_data.data4, &buf[16], sizeof(float));
+
+	cout << rx_data.mode << endl;
+	cout << rx_data.aux_info << endl;
+	cout << rx_data.data1 << endl;
+	cout << rx_data.data4 << endl;
+
 	return 0;
 }
 
-void ncrl_link_buf_push(uint8_t c){
-	if(ncrl_link.buf_pos >= NCRL_LINK_MSG_SIZE) {
+void NCRL_LINK::ncrl_link_buf_push(uint8_t c){
+	if(rx_data.buf_pos >= NCRL_LINK_MSG_SIZE) {
 		/* drop the oldest data and shift the rest to left */
 		int i;
 		for(i = 1; i < NCRL_LINK_MSG_SIZE; i++) {
-			ncrl_link.buf[i - 1] = ncrl_link.buf[i];
+			rx_data.buf[i - 1] = rx_data.buf[i];
 		}
 
 		/* save new byte to the last array element */
-		ncrl_link.buf[NCRL_LINK_MSG_SIZE - 1] = c;
-		ncrl_link.buf_pos = NCRL_LINK_MSG_SIZE;
+		rx_data.buf[NCRL_LINK_MSG_SIZE - 1] = c;
+		rx_data.buf_pos = NCRL_LINK_MSG_SIZE;
 	} else {
 		/* append new byte if the array boundary is not yet reached */
-		ncrl_link.buf[ncrl_link.buf_pos] = c;
-		ncrl_link.buf_pos++;
+		rx_data.buf[rx_data.buf_pos] = c;
+		rx_data.buf_pos++;
 	}
 }
 
+
 int uart_thread_entry(){
-	ros::NodeHandle k;
     ros::Rate loop_rate_(800);
 	char c;
-	ncrl_link.buf_pos = 0;
-
-	uint8_t last_ecbf_mode = 0;
-	ros::Time now_uart_time = ros::Time::now();
-	ros::Time last_uart_time = ros::Time::now();
-
+	NCRL_LINK ncrl_link;
 
 	while(ros::ok()){
-		
 		if(serial_getc(&c) != -1) {
-			ncrl_link_buf_push(c); 
-			if(ncrl_link.buf[0]=='@' && ncrl_link.buf[NCRL_LINK_MSG_SIZE-1] == '+'){
-				if(ncrl_link_decode(ncrl_link.buf)==0){
-					loop_rate_.sleep();
+			ncrl_link.ncrl_link_buf_push(c); 
+			if(ncrl_link.rx_data.buf[0]=='@' && ncrl_link.rx_data.buf[NCRL_LINK_MSG_SIZE-1] == '+'){
+				if(ncrl_link.ncrl_link_decode(ncrl_link.rx_data.buf)==0){
+					ncrl_link.publisher();
+
 					// mode, aux_info, data1, data2, data3, data4
-					send_pose_to_serial(0x02,'r',0.9,2.22,3.5,90);
+					// send_pose_to_serial('e','r',0.9,2.22,3.5,90);
+					
+					send_pose_to_serial(ncrl_link.tx_data.mode,\
+										ncrl_link.tx_data.aux_info,\
+										ncrl_link.tx_data.data1,\
+										ncrl_link.tx_data.data2,\
+										ncrl_link.tx_data.data3,\
+										ncrl_link.tx_data.data4);
+					
+					loop_rate_.sleep();
+			
 				}
 			}
 		}
-		//ros::spinOnce();
 	}
 	return 0;
 
