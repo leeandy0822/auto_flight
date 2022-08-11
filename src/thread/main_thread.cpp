@@ -15,22 +15,11 @@ using namespace std;
 
 NCRL_LINK::NCRL_LINK(){
 	rx_data.buf_pos = 0;
-	pub = n.advertise<auto_flight::ncrl_link>("RX_DATA",1);
-	sub = n.subscribe<auto_flight::ncrl_link>("TX_DATA",1,&NCRL_LINK::callback,this);
-	tx_data.mode = 'a';
-	tx_data.aux_info = 'z';
-	tx_data.data1 = 0.001;
-	tx_data.data2 = 0.001;
-	tx_data.data3 = 0.001;	
+	pub = n.advertise<auto_flight::ncrl_link>("pixhawk_to_pc",1);
 }
-void NCRL_LINK::callback(const auto_flight::ncrl_link::ConstPtr& msg){
-	tx_data.mode = msg->mode[0];
-	tx_data.aux_info = msg->aux_info[0];
-	tx_data.data1 = msg->data1;
-	tx_data.data2 = msg->data2;
-	tx_data.data3 = msg->data3;	
-}
+
 void NCRL_LINK::publisher(){
+
 	auto_flight::ncrl_link pub_data;
 	pub_data.mode = rx_data.mode;
 	pub_data.aux_info = rx_data.aux_info;
@@ -101,19 +90,7 @@ int uart_thread_entry(){
 			if(ncrl_link.rx_data.buf[0]=='@' && ncrl_link.rx_data.buf[NCRL_LINK_MSG_SIZE-1] == '+'){
 				if(ncrl_link.ncrl_link_decode(ncrl_link.rx_data.buf)==0){
 					ncrl_link.publisher();
-
-					// mode, aux_info, data1, data2, data3, data4
-					// send_pose_to_serial('e','r',0.9,2.22,3.5,90);
-					
-					send_pose_to_serial(ncrl_link.tx_data.mode,\
-										ncrl_link.tx_data.aux_info,\
-										ncrl_link.tx_data.data1,\
-										ncrl_link.tx_data.data2,\
-										ncrl_link.tx_data.data3,\
-										ncrl_link.tx_data.data4);
-					
 					loop_rate_.sleep();
-			
 				}
 			}
 		}
@@ -121,10 +98,50 @@ int uart_thread_entry(){
 	return 0;
 
 }
+
+ncrl_link_t tx_data;
+	
+
+void callback(const auto_flight::ncrl_link::ConstPtr& msg){
+	tx_data.mode = msg->mode[0];
+	tx_data.aux_info = msg->aux_info[0];
+	tx_data.data1 = msg->data1;
+	tx_data.data2 = msg->data2;
+	tx_data.data3 = msg->data3;	
+}
+
 int ros_thread_entry(){
-   ros::Rate loop_rate(1600);
+   	ros::Rate loop_rate(300);
+	ros::NodeHandle nh;
+	ros::Subscriber sub;
+
+	sub = nh.subscribe<auto_flight::ncrl_link>("pc_to_pixhawk",1,callback);
+	
+	void callback(const auto_flight::ncrl_link::ConstPtr& msg);
+	
+	/* init tx_data */
+	tx_data.mode = '1';
+	tx_data.aux_info = '2';
+	tx_data.data1 = 0.0;
+	tx_data.data2 = 0.0;
+	tx_data.data3 = 0.0;
 
 	while(ros::ok()){
+		// send_pose_to_serial('4',\
+		// 					'5',\
+		// 					11.0,\
+		// 					22.0,\
+		// 					33.0,\
+		// 					44.0);
+
+		send_pose_to_serial(tx_data.mode,\
+							tx_data.aux_info,\
+							tx_data.data1,\
+							tx_data.data2,\
+							tx_data.data3,\
+							tx_data.data4);
+
+		cout << tx_data.mode << endl;
 		loop_rate.sleep();
 		ros::spinOnce();
 	}

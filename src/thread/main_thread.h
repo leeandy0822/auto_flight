@@ -42,7 +42,6 @@ private :
 
 	ros::NodeHandle n;
 	ros::Publisher pub;
-	ros::Subscriber sub;
 
 public:
 
@@ -54,12 +53,9 @@ public:
 
 	void ncrl_link_buf_push(uint8_t);
 
-	void callback(const auto_flight::ncrl_link::ConstPtr& msg);
-
 	void publisher();
 
 	ncrl_link_t rx_data;
-	ncrl_link_t tx_data;
 
 };
 
