@@ -59,8 +59,8 @@ public:
 
 };
 
-int uart_thread_entry();
+int receive_thread_entry();
 
-int ros_thread_entry();
+int send_thread_entry();
 
 #endif

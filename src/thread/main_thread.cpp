@@ -52,10 +52,10 @@ int NCRL_LINK::ncrl_link_decode(uint8_t *buf){
 	/* swap the order of quaternion to make the frame consistent with ahrs' rotation order */
 	memcpy(&rx_data.data4, &buf[16], sizeof(float));
 
-	cout << rx_data.mode << endl;
-	cout << rx_data.aux_info << endl;
+	cout << "recieve data" << endl;
 	cout << rx_data.data1 << endl;
-	cout << rx_data.data4 << endl;
+	cout << rx_data.data2 << endl;
+	cout << rx_data.data3 << endl;
 
 	return 0;
 }
@@ -79,7 +79,7 @@ void NCRL_LINK::ncrl_link_buf_push(uint8_t c){
 }
 
 
-int uart_thread_entry(){
+int receive_thread_entry(){
     ros::Rate loop_rate_(800);
 	char c;
 	NCRL_LINK ncrl_link;
@@ -101,7 +101,6 @@ int uart_thread_entry(){
 
 ncrl_link_t tx_data;
 	
-
 void callback(const auto_flight::ncrl_link::ConstPtr& msg){
 	tx_data.mode = msg->mode[0];
 	tx_data.aux_info = msg->aux_info[0];
@@ -110,7 +109,7 @@ void callback(const auto_flight::ncrl_link::ConstPtr& msg){
 	tx_data.data3 = msg->data3;	
 }
 
-int ros_thread_entry(){
+int send_thread_entry(){
    	ros::Rate loop_rate(300);
 	ros::NodeHandle nh;
 	ros::Subscriber sub;
@@ -120,20 +119,13 @@ int ros_thread_entry(){
 	void callback(const auto_flight::ncrl_link::ConstPtr& msg);
 	
 	/* init tx_data */
-	tx_data.mode = '1';
+	tx_data.mode = '0';
 	tx_data.aux_info = '2';
 	tx_data.data1 = 0.0;
 	tx_data.data2 = 0.0;
 	tx_data.data3 = 0.0;
 
 	while(ros::ok()){
-		// send_pose_to_serial('4',\
-		// 					'5',\
-		// 					11.0,\
-		// 					22.0,\
-		// 					33.0,\
-		// 					44.0);
-
 		send_pose_to_serial(tx_data.mode,\
 							tx_data.aux_info,\
 							tx_data.data1,\
@@ -141,7 +133,7 @@ int ros_thread_entry(){
 							tx_data.data3,\
 							tx_data.data4);
 
-		cout << tx_data.mode << endl;
+		cout << "mode : " << tx_data.mode << endl;
 		loop_rate.sleep();
 		ros::spinOnce();
 	}
