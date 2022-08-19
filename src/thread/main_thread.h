@@ -2,6 +2,7 @@
 #define __MAIN_THREAD__
 
 #include "auto_flight/ncrl_link.h"
+
 // pc -> px4
 #define NCRL_LINK_SERIAL_MSG_SIZE 22
 // for check

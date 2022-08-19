@@ -6,7 +6,6 @@
 #include <cmath>
 #include <vector>
 #include <string>
-#include <iterator>
 
 #include "main_thread.h"
 
@@ -110,7 +109,7 @@ void callback(const auto_flight::ncrl_link::ConstPtr& msg){
 }
 
 int send_thread_entry(){
-   	ros::Rate loop_rate(300);
+   	ros::Rate loop_rate(400);
 	ros::NodeHandle nh;
 	ros::Subscriber sub;
 
