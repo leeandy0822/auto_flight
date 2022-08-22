@@ -3,8 +3,12 @@
 ## run this code!
 
 ```bash=
-rosrun auto_flight controller
+$ sudo chmod 777 /dev/ttyUSB* 
+$ rosrun auto_flight controller
 ```
+
+note : You may need to change USB port in [main.cpp](src/main.cpp)
+
 
 ## format 
 
@@ -16,7 +20,7 @@ data|start byte| checksum|mode |aux_info|pos|-|end byte
 
 topic : /pc_to_pixhawk 
 
-msg form : auto_flight/ncrl_link.msg (you need to source this pakege if you want to use this topic.)
+msg type : auto_flight/ncrl_link.msg (You need to source the workspace of this package if you want to use this topic.)
 
 
 task | mode | data1 ~ data3 |  
