@@ -213,8 +213,17 @@ add_executable(controller
 
 target_link_libraries(controller PUBLIC
   ${catkin_LIBRARIES}
-
 )
 
 add_dependencies(controller ${catkin_EXPORTED_TARGETS})
+
+add_executable(mission
+  src/mission.cpp
+)
+
+target_link_libraries(mission PUBLIC
+  ${catkin_LIBRARIES}
+)
+
+add_dependencies(mission ${catkin_EXPORTED_TARGETS})
 
