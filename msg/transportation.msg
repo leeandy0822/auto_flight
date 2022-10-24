@@ -1,0 +1,11 @@
+int32 tracker_id
+float32 px
+float32 py
+float32 pz
+float32 qx
+float32 qy
+float32 qz
+float32 qw
+float32 roll
+float32 pitch
+float32 thrust

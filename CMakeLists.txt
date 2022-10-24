@@ -51,6 +51,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   ncrl_link.msg
+  transportation.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -216,14 +217,3 @@ target_link_libraries(controller PUBLIC
 )
 
 add_dependencies(controller ${catkin_EXPORTED_TARGETS})
-
-add_executable(mission
-  src/mission.cpp
-)
-
-target_link_libraries(mission PUBLIC
-  ${catkin_LIBRARIES}
-)
-
-add_dependencies(mission ${catkin_EXPORTED_TARGETS})
-

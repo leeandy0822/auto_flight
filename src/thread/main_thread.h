@@ -2,9 +2,9 @@
 #define __MAIN_THREAD__
 
 #include "auto_flight/ncrl_link.h"
-
+#include "auto_flight/transportation.h"
 // pc -> px4
-#define NCRL_LINK_SERIAL_MSG_SIZE 22
+#define NCRL_LINK_SERIAL_MSG_SIZE 44
 // for check
 #define NCRL_LINK_CHECKSUM_INIT_VAL 19
 // px4->pc
@@ -16,26 +16,22 @@
 
 typedef struct {
 	
-	float acc[3];
-
-	float gyrop[3];
-
 	volatile int buf_pos;
-
 	double deviation_acc;	
-
-
-	char mode;
-	char aux_info;
-	float data1;
-	float data2;
-	float data3;
-	float data4;
-
+	int tracker_id;
+	float px;
+	float py;
+	float pz;
+	float qx;	
+	float qy;
+	float qz;
+	float qw;
+	float roll;
+	float pitch;
+	float thrust;
 	uint8_t buf[44];
 
-
-} ncrl_link_t;
+} transportation_t;
 
 class NCRL_LINK{
 
@@ -56,7 +52,7 @@ public:
 
 	void publisher();
 
-	ncrl_link_t rx_data;
+	transportation_t rx_data;
 
 };
 
