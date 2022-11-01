@@ -122,12 +122,12 @@ void callback(const auto_flight::transportation::ConstPtr& msg){
 }
 
 int send_thread_entry(){
-   	ros::Rate loop_rate(100);
+
+   	ros::Rate loop_rate(120);
 	ros::NodeHandle nh;
 	ros::Subscriber sub;
 
 	sub = nh.subscribe<auto_flight::transportation>("pc_to_pixhawk",1,callback);
-	
 	void callback(const auto_flight::transportation::ConstPtr& msg);
 	
 	/* init tx_data */

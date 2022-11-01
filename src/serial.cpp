@@ -111,7 +111,7 @@ void send_pose_to_serial(int tracker_id, float pos_x_m, float pos_y_m, float pos
                  "orientation=(x:%.2lf, y:%.2lf, z:%.2lf, w:%.2lf), "
 				 "command = (roll:%.2f, pitch:%.2f, thrust:%.2f)",
         	 real_freq, tracker_id,
-                 pos_x_m * 100.0f, pos_y_m * 100.0f, pos_z_m * 100.0f,
+                 pos_x_m * 10.0f, pos_y_m * 10.0f, pos_z_m * 10.0f,
                  quat_x, quat_y, quat_z, quat_w, roll, pitch, thrust);
 
 	/*+------------+----------+----+---+---+---+----+----+----+----+---------------------------------+

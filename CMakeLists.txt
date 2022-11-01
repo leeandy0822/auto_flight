@@ -52,6 +52,7 @@ add_message_files(
   FILES
   ncrl_link.msg
   transportation.msg
+  command.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -217,3 +218,23 @@ target_link_libraries(controller PUBLIC
 )
 
 add_dependencies(controller ${catkin_EXPORTED_TARGETS})
+
+add_executable(xbee_sender
+  src/xbee_sender.cpp
+)
+
+target_link_libraries(xbee_sender PUBLIC
+  ${catkin_LIBRARIES}
+)
+
+add_dependencies(xbee_sender ${catkin_EXPORTED_TARGETS})
+
+add_executable(command_publisher
+  src/command_publisher.cpp
+)
+
+target_link_libraries(command_publisher PUBLIC
+  ${catkin_LIBRARIES}
+)
+
+add_dependencies(command_publisher ${catkin_EXPORTED_TARGETS})
