@@ -123,7 +123,7 @@ void callback(const auto_flight::transportation::ConstPtr& msg){
 
 int send_thread_entry(){
 
-   	ros::Rate loop_rate(120);
+   	ros::Rate loop_rate(100);
 	ros::NodeHandle nh;
 	ros::Subscriber sub;
 
