@@ -15,9 +15,8 @@
 
 using namespace std;
 
-int serial_fd = 0;
 
-void serial_init(char *port_name, int baudrate)
+void serial_init(char *port_name, int baudrate, int serial_fd)
 {
 	//open the port
 	serial_fd = open(port_name, O_RDWR | O_NOCTTY /*| O_NONBLOCK*/);
@@ -78,7 +77,7 @@ int check_rigid_body_name(char *name, int *id)
 }
 
 
-void serial_puts(char *s, size_t size)
+void serial_puts(char *s, size_t size, int serial_fd)
 {
 	write(serial_fd, s, size);
 }
@@ -95,8 +94,8 @@ static uint8_t generate_ncrl_link_checksum_byte(uint8_t *payload, int payload_co
 
 // Combination of Optitrack and command 
 
-void send_pose_to_serial(int tracker_id, float pos_x_m, float pos_y_m, float pos_z_m,
-			 float quat_x, float quat_y, float quat_z, float quat_w, float roll, float pitch, float thrust)
+void send_pose_to_serial_1(int tracker_id, float pos_x_m, float pos_y_m, float pos_z_m,
+			 float quat_x, float quat_y, float quat_z, float quat_w, float roll, float pitch, float thrust, int serial_fd)
 {
 	static double last_execute_time = 0;
 	static double current_time;
@@ -107,10 +106,73 @@ void send_pose_to_serial(int tracker_id, float pos_x_m, float pos_y_m, float pos
 
 	last_execute_time = current_time;
 
-	ROS_INFO("[%fHz] id:%d, position=(x:%.2lf, y:%.2lf, z:%.2lf), "
-                 "orientation=(x:%.2lf, y:%.2lf, z:%.2lf, w:%.2lf), "
-				 "command = (roll:%.2f, pitch:%.2f, thrust:%.2f)",
-        	 real_freq, tracker_id,
+	ROS_INFO("UAV:%d,[%.2fHz] id:%d,position=(x:%.2lf,y:%.2lf,z:%.2lf), "
+                 "orientation=(x:%.1lf,y:%.1lf,z:%.1lf,w:%.1lf),"
+				 "command = (roll:%.1f,pitch:%.1f,thrust:%.1f)",
+        	 serial_fd, real_freq, tracker_id,
+                 pos_x_m * 10.0f, pos_y_m * 10.0f, pos_z_m * 10.0f,
+                 quat_x, quat_y, quat_z, quat_w, roll, pitch, thrust);
+
+	/*+------------+----------+----+---+---+---+----+----+----+----+---------------------------------+
+    *| start byte | checksum | id | x | y | z | qx | qy | qz | qw | roll | pitch | thrust | end byte |
+    *+------------+----------+----+---+---+---+----+----+----+----+---------------------------------+*/
+	char msg_buf[NCRL_LINK_SERIAL_MSG_SIZE] = {0};
+	int msg_pos = 0;
+
+	/* reserve 2 for start byte and checksum byte as header */
+	msg_buf[msg_pos] = '@'; //start byte
+	msg_pos += sizeof(uint8_t);
+	msg_buf[msg_pos] = 0;
+	msg_pos += sizeof(uint8_t);
+	msg_buf[msg_pos] = tracker_id;
+	msg_pos += sizeof(uint8_t);
+	/* pack payloads */
+	memcpy(msg_buf + msg_pos, &pos_x_m, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &pos_y_m, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &pos_z_m, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &quat_x, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &quat_y, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &quat_z, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &quat_w, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &roll, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &pitch, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &thrust, sizeof(float));
+	msg_pos += sizeof(float);
+    msg_buf[msg_pos] = '+'; //end byte
+	msg_pos += sizeof(uint8_t);
+
+	/* generate and fill the checksum field */
+	msg_buf[1] = generate_ncrl_link_checksum_byte((uint8_t *)&msg_buf[3], NCRL_LINK_SERIAL_MSG_SIZE - 4);
+	
+	serial_puts(msg_buf, NCRL_LINK_SERIAL_MSG_SIZE, serial_fd);
+}
+
+
+void send_pose_to_serial_2(int tracker_id, float pos_x_m, float pos_y_m, float pos_z_m,
+			 float quat_x, float quat_y, float quat_z, float quat_w, float roll, float pitch, float thrust, int serial_fd)
+{
+	static double last_execute_time = 0;
+	static double current_time;
+
+	current_time = ros::Time::now().toSec();
+
+	double real_freq = 1.0f / (current_time - last_execute_time); //real sending frequeuncy
+
+	last_execute_time = current_time;
+
+	ROS_INFO("UAV:%d,[%.2fHz] id:%d,position=(x:%.2lf,y:%.2lf,z:%.2lf), "
+                 "orientation=(x:%.1lf,y:%.1lf,z:%.1lf,w:%.1lf),"
+				 "command = (roll:%.1f,pitch:%.1f,thrust:%.1f)",
+        	 serial_fd, real_freq, tracker_id,
                  pos_x_m * 10.0f, pos_y_m * 10.0f, pos_z_m * 10.0f,
                  quat_x, quat_y, quat_z, quat_w, roll, pitch, thrust);
 
@@ -154,10 +216,67 @@ void send_pose_to_serial(int tracker_id, float pos_x_m, float pos_y_m, float pos
 	/* generate and fill the checksum field */
 	msg_buf[1] = generate_ncrl_link_checksum_byte((uint8_t *)&msg_buf[3], NCRL_LINK_SERIAL_MSG_SIZE - 4);
 
-	serial_puts(msg_buf, NCRL_LINK_SERIAL_MSG_SIZE);
+	serial_puts(msg_buf, NCRL_LINK_SERIAL_MSG_SIZE, serial_fd);
 }
 
-int serial_getc(char *c)
+void send_pose_to_serial_3(int tracker_id, float pos_x_m, float pos_y_m, float pos_z_m,
+			 float quat_x, float quat_y, float quat_z, float quat_w, float roll, float pitch, float thrust, int serial_fd)
 {
-	return read(serial_fd, c, 1);
+	static double last_execute_time = 0;
+	static double current_time;
+
+	current_time = ros::Time::now().toSec();
+
+	double real_freq = 1.0f / (current_time - last_execute_time); //real sending frequeuncy
+
+	last_execute_time = current_time;
+
+	ROS_INFO("UAV:%d,[%.2fHz] id:%d,position=(x:%.2lf,y:%.2lf,z:%.2lf), "
+                 "orientation=(x:%.1lf,y:%.1lf,z:%.1lf,w:%.1lf),"
+				 "command = (roll:%.1f,pitch:%.1f,thrust:%.1f)",
+        	 serial_fd, real_freq, tracker_id,
+                 pos_x_m * 10.0f, pos_y_m * 10.0f, pos_z_m * 10.0f,
+                 quat_x, quat_y, quat_z, quat_w, roll, pitch, thrust);
+
+	/*+------------+----------+----+---+---+---+----+----+----+----+---------------------------------+
+    *| start byte | checksum | id | x | y | z | qx | qy | qz | qw | roll | pitch | thrust | end byte |
+    *+------------+----------+----+---+---+---+----+----+----+----+---------------------------------+*/
+	char msg_buf[NCRL_LINK_SERIAL_MSG_SIZE] = {0};
+	int msg_pos = 0;
+
+	/* reserve 2 for start byte and checksum byte as header */
+	msg_buf[msg_pos] = '@'; //start byte
+	msg_pos += sizeof(uint8_t);
+	msg_buf[msg_pos] = 0;
+	msg_pos += sizeof(uint8_t);
+	msg_buf[msg_pos] = tracker_id;
+	msg_pos += sizeof(uint8_t);
+	/* pack payloads */
+	memcpy(msg_buf + msg_pos, &pos_x_m, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &pos_y_m, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &pos_z_m, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &quat_x, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &quat_y, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &quat_z, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &quat_w, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &roll, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &pitch, sizeof(float));
+	msg_pos += sizeof(float);
+	memcpy(msg_buf + msg_pos, &thrust, sizeof(float));
+	msg_pos += sizeof(float);
+    msg_buf[msg_pos] = '+'; //end byte
+	msg_pos += sizeof(uint8_t);
+
+	/* generate and fill the checksum field */
+	msg_buf[1] = generate_ncrl_link_checksum_byte((uint8_t *)&msg_buf[3], NCRL_LINK_SERIAL_MSG_SIZE - 4);
+
+	serial_puts(msg_buf, NCRL_LINK_SERIAL_MSG_SIZE, serial_fd);
 }

@@ -58,6 +58,11 @@ public:
 
 int receive_thread_entry();
 
-int send_thread_entry();
+int send_thread_entry_1(int serial_fd);
+int send_thread_entry_2(int serial_fd);
+int send_thread_entry_3(int serial_fd);
+void callback1(const auto_flight::transportation::ConstPtr& msg);
+void callback2(const auto_flight::transportation::ConstPtr& msg);
+void callback3(const auto_flight::transportation::ConstPtr& msg);
 
 #endif
