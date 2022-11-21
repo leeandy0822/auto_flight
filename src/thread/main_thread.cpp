@@ -22,6 +22,8 @@ double last_exe_time_3 = 0 ;
 
 void callback1(const auto_flight::transportation::ConstPtr& msg){
 	tx_data_1.tracker_id = msg->tracker_id;
+	tx_data_1.tracker_id = 1;
+
 	tx_data_1.px = msg->px;
 	tx_data_1.py = msg->py;
 	tx_data_1.pz = msg->pz;
@@ -36,6 +38,8 @@ void callback1(const auto_flight::transportation::ConstPtr& msg){
 
 void callback2(const auto_flight::transportation::ConstPtr& msg){
 	tx_data_2.tracker_id = msg->tracker_id;
+	tx_data_2.tracker_id = 15;
+
 	tx_data_2.px = msg->px;
 	tx_data_2.py = msg->py;
 	tx_data_2.pz = msg->pz;
@@ -50,6 +54,7 @@ void callback2(const auto_flight::transportation::ConstPtr& msg){
 
 void callback3(const auto_flight::transportation::ConstPtr& msg){
 	tx_data_3.tracker_id = msg->tracker_id;
+	tx_data_3.tracker_id = 5;
 	tx_data_3.px = msg->px;
 	tx_data_3.py = msg->py;
 	tx_data_3.pz = msg->pz;

@@ -20,18 +20,18 @@ main(int argc ,char **argv){
 
 	cout << "port1 init" << endl;        
 	serial_init((char *)"/dev/ttyUSB0", 115200, serial_id_1);
-	cout << "port2 init" << endl;        
-	serial_init((char *)"/dev/ttyUSB1", 115200, serial_id_2);
-	cout << "port3 init" << endl;        
-	serial_init((char *)"/dev/ttyUSB2", 115200, serial_id_3);
+	// cout << "port2 init" << endl;        
+	// serial_init((char *)"/dev/ttyUSB1", 115200, serial_id_2);
+	// cout << "port3 init" << endl;        
+	// serial_init((char *)"/dev/ttyUSB2", 115200, serial_id_3);
 
 	std::thread send_thread_1(send_thread_entry_1, serial_id_1);
-	std::thread send_thread_2(send_thread_entry_2, serial_id_2);
-	std::thread send_thread_3(send_thread_entry_3, serial_id_3);
-	
+	// std::thread send_thread_2(send_thread_entry_2, serial_id_2);
+	// std::thread send_thread_3(send_thread_entry_3, serial_id_3);
+
 	send_thread_1.join();
-	send_thread_2.join();
-	send_thread_3.join();
+	// send_thread_2.join();
+	// send_thread_3.join();
 
 	return 0;
 }
