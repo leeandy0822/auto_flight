@@ -33,31 +33,8 @@ typedef struct {
 
 } transportation_t;
 
-class NCRL_LINK{
-
-private :
-
-	ros::NodeHandle n;
-	ros::Publisher pub;
-
-public:
-
-	NCRL_LINK();
-
-	uint8_t generate_ncrl_link_checksum_byte(uint8_t *, int);
-
-	int ncrl_link_decode(uint8_t *);
-
-	void ncrl_link_buf_push(uint8_t);
-
-	void publisher();
-
-	transportation_t rx_data;
-
-};
-
-int receive_thread_entry();
 
 int send_thread_entry();
 
+void callback(const auto_flight::transportation::ConstPtr& msg);
 #endif

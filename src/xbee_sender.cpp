@@ -5,56 +5,126 @@
 #include "auto_flight/command.h"
 
 
-auto_flight::transportation transport_msg;
-auto_flight::command command_msg;
-geometry_msgs::PoseStamped optitrack_data;
+auto_flight::transportation transport_msg_1;
+auto_flight::command command_msg_1;
+geometry_msgs::PoseStamped optitrack_data_1;
 
-void optitrack_cb(const geometry_msgs::PoseStamped::ConstPtr& msg)
+auto_flight::transportation transport_msg_2;
+auto_flight::command command_msg_2;
+geometry_msgs::PoseStamped optitrack_data_2;
+
+auto_flight::transportation transport_msg_3;
+auto_flight::command command_msg_3;
+geometry_msgs::PoseStamped optitrack_data_3;
+
+void optitrack_cb_1(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
-  optitrack_data = *msg;
-  transport_msg.px = optitrack_data.pose.position.x;
-  transport_msg.py = optitrack_data.pose.position.y;
-  transport_msg.pz = optitrack_data.pose.position.z;
-  transport_msg.qx = optitrack_data.pose.orientation.x;
-  transport_msg.qy = optitrack_data.pose.orientation.y;
-  transport_msg.qz = optitrack_data.pose.orientation.z;
-  transport_msg.qw = optitrack_data.pose.orientation.w;
+  optitrack_data_1 = *msg;
+  transport_msg_1.px = optitrack_data_1.pose.position.x;
+  transport_msg_1.py = optitrack_data_1.pose.position.y;
+  transport_msg_1.pz = optitrack_data_1.pose.position.z;
+  transport_msg_1.qx = optitrack_data_1.pose.orientation.x;
+  transport_msg_1.qy = optitrack_data_1.pose.orientation.y;
+  transport_msg_1.qz = optitrack_data_1.pose.orientation.z;
+  transport_msg_1.qw = optitrack_data_1.pose.orientation.w;
 }
 
-void command_cb(const auto_flight::command::ConstPtr& msg)
+void optitrack_cb_2(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
-  command_msg = *msg;
+  optitrack_data_2 = *msg;
+  transport_msg_2.px = optitrack_data_2.pose.position.x;
+  transport_msg_2.py = optitrack_data_2.pose.position.y;
+  transport_msg_2.pz = optitrack_data_2.pose.position.z;
+  transport_msg_2.qx = optitrack_data_2.pose.orientation.x;
+  transport_msg_2.qy = optitrack_data_2.pose.orientation.y;
+  transport_msg_2.qz = optitrack_data_2.pose.orientation.z;
+  transport_msg_2.qw = optitrack_data_2.pose.orientation.w;
+}
+void optitrack_cb_3(const geometry_msgs::PoseStamped::ConstPtr& msg)
+{
+  optitrack_data_3 = *msg;
+  transport_msg_3.px = optitrack_data_3.pose.position.x;
+  transport_msg_3.py = optitrack_data_3.pose.position.y;
+  transport_msg_3.pz = optitrack_data_3.pose.position.z;
+  transport_msg_3.qx = optitrack_data_3.pose.orientation.x;
+  transport_msg_3.qy = optitrack_data_3.pose.orientation.y;
+  transport_msg_3.qz = optitrack_data_3.pose.orientation.z;
+  transport_msg_3.qw = optitrack_data_3.pose.orientation.w;
+}
+
+void command_cb_1(const auto_flight::command::ConstPtr& msg)
+{
+  command_msg_1 = *msg;
   // degree
-  transport_msg.roll = command_msg.roll;
+  transport_msg_1.roll = command_msg_1.roll;
   // degree
-  transport_msg.pitch = command_msg.pitch;
+  transport_msg_1.pitch = command_msg_1.pitch;
   // newton
-  transport_msg.thrust = command_msg.thrust;
+  transport_msg_1.thrust = command_msg_1.thrust;
 }
 
+void command_cb_2(const auto_flight::command::ConstPtr& msg)
+{
+  command_msg_2 = *msg;
+  // degree
+  transport_msg_2.roll = command_msg_2.roll;
+  // degree
+  transport_msg_2.pitch = command_msg_2.pitch;
+  // newton
+  transport_msg_2.thrust = command_msg_2.thrust;
+}
+void command_cb_3(const auto_flight::command::ConstPtr& msg)
+{
+  command_msg_3 = *msg;
+  // degree
+  transport_msg_3.roll = command_msg_3.roll;
+  // degree
+  transport_msg_3.pitch = command_msg_3.pitch;
+  // newton
+  transport_msg_3.thrust = command_msg_3.thrust;
+}
 int main(int argc, char **argv)
 {
 
   ros::init(argc, argv, "xbee_sender");
   ros::NodeHandle n;
 
-  ros::Publisher transport_pub = n.advertise<auto_flight::transportation>("pc_to_pixhawk",1);
-  ros::Subscriber optitrack_sub = n.subscribe<geometry_msgs::PoseStamped>("/vrpn_client_node/MAV1/pose",3,optitrack_cb);
-  ros::Subscriber command_sub = n.subscribe<auto_flight::command>("transport_command",1, command_cb);
+  ros::Publisher transport_pub_1 = n.advertise<auto_flight::transportation>("pc_to_pixhawk_1",1);
+  ros::Subscriber optitrack_sub_1 = n.subscribe<geometry_msgs::PoseStamped>("/vrpn_client_node/MAV1/pose",3,optitrack_cb_1);
+  ros::Subscriber command_sub_1 = n.subscribe<auto_flight::command>("transport_command_1",1, command_cb_1);
+  
+  ros::Publisher transport_pub_2 = n.advertise<auto_flight::transportation>("pc_to_pixhawk_2",1);
+  ros::Subscriber optitrack_sub_2 = n.subscribe<geometry_msgs::PoseStamped>("/vrpn_client_node/MAV2/pose",3,optitrack_cb_2);
+  ros::Subscriber command_sub_2 = n.subscribe<auto_flight::command>("transport_command_2",1, command_cb_2);
+  
+  ros::Publisher transport_pub_3 = n.advertise<auto_flight::transportation>("pc_to_pixhawk_3",1);
+  ros::Subscriber optitrack_sub_3 = n.subscribe<geometry_msgs::PoseStamped>("/vrpn_client_node/MAV3/pose",3,optitrack_cb_3);
+  ros::Subscriber command_sub_3 = n.subscribe<auto_flight::command>("transport_command_3",1, command_cb_3);
 
   ros::Rate loop_rate(400);
   // default = 1
-  transport_msg.tracker_id = 1;
+  transport_msg_1.tracker_id = 1;
+  transport_msg_2.tracker_id = 2;
+  transport_msg_3.tracker_id = 3;
   // degree
-  transport_msg.roll = 0;
+  transport_msg_1.roll = 0;
+  transport_msg_2.roll = 0;
+  transport_msg_3.roll = 0;
   // degree
-  transport_msg.pitch = 0;
+  transport_msg_1.pitch = 0;
+  transport_msg_2.pitch = 0;
+  transport_msg_3.pitch = 0;
   // newton
-  transport_msg.thrust = 5;
+  transport_msg_1.thrust = 5;
+  transport_msg_2.thrust = 5;
+  transport_msg_3.thrust = 5;
+
   while (ros::ok())
   {
 
-    transport_pub.publish(transport_msg);
+    transport_pub_1.publish(transport_msg_1);
+    transport_pub_2.publish(transport_msg_2);
+    transport_pub_3.publish(transport_msg_3);
 
     ros::spinOnce();
 
