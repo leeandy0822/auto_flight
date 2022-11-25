@@ -209,17 +209,38 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(controller
+add_executable(controller_1
   src/thread/main_thread.cpp
   src/serial.cpp
-  src/main.cpp
+  src/main_1.cpp
 )
 
-target_link_libraries(controller PUBLIC
+add_executable(controller_2
+  src/thread/main_thread.cpp
+  src/serial.cpp
+  src/main_2.cpp
+)
+
+add_executable(controller_3
+  src/thread/main_thread.cpp
+  src/serial.cpp
+  src/main_3.cpp
+)
+
+
+target_link_libraries(controller_1 PUBLIC
   ${catkin_LIBRARIES}
 )
 
-add_dependencies(controller ${catkin_EXPORTED_TARGETS})
+target_link_libraries(controller_2 PUBLIC
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(controller_3 PUBLIC
+  ${catkin_LIBRARIES}
+)
+add_dependencies(controller_1 ${catkin_EXPORTED_TARGETS})
+add_dependencies(controller_2 ${catkin_EXPORTED_TARGETS})
+add_dependencies(controller_3 ${catkin_EXPORTED_TARGETS})
 
 add_executable(xbee_sender
   src/xbee_sender.cpp

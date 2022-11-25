@@ -16,7 +16,7 @@
 #include <iostream>
 
 // Xbee Output: uav_command : roll, pitch, yaw
-auto_flight::command uav1_command;
+auto_flight::command uav1_command ;
 auto_flight::command uav2_command;
 auto_flight::command uav3_command;
 geometry_msgs::PoseStamped uav_pose;
@@ -134,7 +134,7 @@ int main(int argc, char **argv)
   ros::Publisher uav2_command_pub = n.advertise<auto_flight::command>("pc_to_pixhawk_2", 1);
   ros::Publisher uav3_command_pub = n.advertise<auto_flight::command>("pc_to_pixhawk_3", 1);
 
-  ros::Rate loop_rate(50);
+  ros::Rate loop_rate(120);
 
   int count = 0;
   while (ros::ok())
