@@ -54,7 +54,7 @@ void command_maker(geometry_msgs::Vector3& uav_command_raw, auto_flight::command
   Eigen::Vector3d U = 1/f_norm*z_rot.transpose()*temp;
   // Get command
   uav_command.roll = -asin(U(1));
-  uav_command.pitch = atan( U(0) / U(2));
+  uav_command.pitch = atan(U(0)/U(2));
   uav_command.thrust = f_norm;
 }
 
