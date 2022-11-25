@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  tf_conversions
+  eigen_conversions
 )
 
 ## System dependencies are found with CMake's conventions
@@ -222,19 +224,15 @@ add_dependencies(controller ${catkin_EXPORTED_TARGETS})
 add_executable(xbee_sender
   src/xbee_sender.cpp
 )
-
 target_link_libraries(xbee_sender PUBLIC
   ${catkin_LIBRARIES}
 )
-
 add_dependencies(xbee_sender ${catkin_EXPORTED_TARGETS})
 
-add_executable(command_publisher
-  src/command_publisher.cpp
+add_executable(total_to_uav
+  src/total_to_uav.cpp
 )
-
-target_link_libraries(command_publisher PUBLIC
+target_link_libraries(total_to_uav PUBLIC
   ${catkin_LIBRARIES}
 )
-
-add_dependencies(command_publisher ${catkin_EXPORTED_TARGETS})
+add_dependencies(total_to_uav ${catkin_EXPORTED_TARGETS})

@@ -21,6 +21,7 @@ void optitrack_cb(const geometry_msgs::PoseStamped::ConstPtr& msg)
   transport_msg.qw = optitrack_data.pose.orientation.w;
 }
 
+
 void command_cb(const auto_flight::command::ConstPtr& msg)
 {
   command_msg = *msg;
@@ -31,6 +32,7 @@ void command_cb(const auto_flight::command::ConstPtr& msg)
   // newton
   transport_msg.thrust = command_msg.thrust;
 }
+
 
 int main(int argc, char **argv)
 {
