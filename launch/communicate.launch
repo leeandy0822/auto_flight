@@ -1,28 +1,33 @@
-<!-- for trajectory tracking -->
+<!-- optitrack and controller to xbee command sending -->
 <launch>
 
+    <!-- get the necessary orientation and position for uavs -->
     <node name="xbee_sender" pkg="auto_flight" type="xbee_sender" output="screen">
     </node>
 
-<group ns="uav1">
-    <node name="xbee_transfrom" pkg="auto_flight" type="controller_1" output="screen">
-        <param name="port_name" value="/dev/ttyUSB0" />
-        <param name="node_name" value="/pc_to_pixhawk_1" />
+    <node name="total_to_uav" pkg="auto_flight" type="xbee_sender" output="screen">
     </node>
-</group>
 
-<group ns="uav2">
-    <node name="xbee_transfrom" pkg="auto_flight" type="controller_2" output="screen">
-        <param name="port_name" value="/dev/ttyUSB1" />
-        <param name="node_name" value="/pc_to_pixhawk_2" />
-    </node>
-</group>
+    <!-- send command  -->
+    <group ns="uav1">
+        <node name="xbee_send" pkg="auto_flight" type="controller_1" output="screen">
+            <param name="port_name" value="/dev/ttyUSB0" />
+            <param name="node_name" value="/pc_to_pixhawk_1" />
+        </node>
+    </group>
 
-<group ns="uav3">
-    <node name="xbee_transfrom" pkg="auto_flight" type="controller_3" output="screen">
-        <param name="port_name" value="/dev/ttyUSB2" />
-        <param name="node_name" value="/pc_to_pixhawk_3" />
-    </node>
-</group>
+    <group ns="uav2">
+        <node name="xbee_send" pkg="auto_flight" type="controller_2" output="screen">
+            <param name="port_name" value="/dev/ttyUSB1" />
+            <param name="node_name" value="/pc_to_pixhawk_2" />
+        </node>
+    </group>
+
+    <group ns="uav3">
+        <node name="xbee_send" pkg="auto_flight" type="controller_3" output="screen">
+            <param name="port_name" value="/dev/ttyUSB2" />
+            <param name="node_name" value="/pc_to_pixhawk_3" />
+        </node>
+    </group>
 
 </launch>

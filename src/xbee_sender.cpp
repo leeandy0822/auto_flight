@@ -101,23 +101,23 @@ int main(int argc, char **argv)
   ros::Subscriber optitrack_sub_3 = n.subscribe<geometry_msgs::PoseStamped>("/vrpn_client_node/MAV3/pose",3,optitrack_cb_3);
   ros::Subscriber command_sub_3 = n.subscribe<auto_flight::command>("transport_command_3",1, command_cb_3);
 
-  ros::Rate loop_rate(400);
-  // default = 1
+  ros::Rate loop_rate(100);
+  // // default = 1
   transport_msg_1.tracker_id = 1;
   transport_msg_2.tracker_id = 2;
   transport_msg_3.tracker_id = 3;
-  // degree
-  transport_msg_1.roll = 0;
-  transport_msg_2.roll = 0;
-  transport_msg_3.roll = 0;
-  // degree
-  transport_msg_1.pitch = 0;
-  transport_msg_2.pitch = 0;
-  transport_msg_3.pitch = 0;
-  // newton
-  transport_msg_1.thrust = 5;
-  transport_msg_2.thrust = 5;
-  transport_msg_3.thrust = 5;
+  // // degree
+  // transport_msg_1.roll = 0;
+  // transport_msg_2.roll = 0;
+  // transport_msg_3.roll = 0;
+  // // degree
+  // transport_msg_1.pitch = 0;
+  // transport_msg_2.pitch = 0;
+  // transport_msg_3.pitch = 0;
+  // // newton
+  // transport_msg_1.thrust = 5;
+  // transport_msg_2.thrust = 5;
+  // transport_msg_3.thrust = 5;
 
   while (ros::ok())
   {

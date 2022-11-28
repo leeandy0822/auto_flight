@@ -69,9 +69,7 @@ void uav1_cb(const geometry_msgs::PoseStamped::ConstPtr& msg){
   
   command_maker(uav1_command_raw, uav1_command , uav1_R);
   std::cout << "UAV1 RPY angle (rad) : " << uav1_R.roll << " "<< uav1_R.pitch << " "<< uav1_R.yaw << std::endl;
-  std::cout << "UAV1 Command (RPT): " << uav1_command.roll << " "<< uav1_R.pitch << " "<< uav1_R.yaw << std::endl;
-	
-  ROS_INFO( "UAV_command=(R:%.2lf(rad), P:%.2lf(rad), T:%.2lf(N))"
+  ROS_INFO( "UAV1_command=(R:%.2lf(rad), P:%.2lf(rad), T:%.2lf(N))"
                  ,uav1_command.roll, uav1_command.pitch, uav1_command.thrust);
 
 }
@@ -87,7 +85,7 @@ void uav2_cb(const geometry_msgs::PoseStamped::ConstPtr& msg){
   std::cout << "UAV2 RPY angle (rad) : " << uav2_R.roll << " "<< uav2_R.pitch << " "<< uav2_R.yaw << std::endl;
   command_maker(uav2_command_raw, uav2_command , uav2_R);
   
-  ROS_INFO( "UAV_command=(R:%.2lf(rad), P:%.2lf(rad), T:%.2lf(N))"
+  ROS_INFO( "UAV2_command=(R:%.2lf(rad), P:%.2lf(rad), T:%.2lf(N))"
                  ,uav2_command.roll, uav2_command.pitch, uav2_command.thrust);
 
 }
@@ -103,7 +101,7 @@ void uav3_cb(const geometry_msgs::PoseStamped::ConstPtr& msg){
   eigen_quat.toRotationMatrix();
   std::cout << "UAV3 RPY angle (rad) : " << uav3_R.roll << " "<< uav3_R.pitch << " "<< uav3_R.yaw << std::endl;
   command_maker(uav3_command_raw, uav3_command , uav3_R);
-  ROS_INFO( "UAV_command=(R:%.2lf(rad), P:%.2lf(rad), T:%.2lf(N))"
+  ROS_INFO( "UAV3_command=(R:%.2lf(rad), P:%.2lf(rad), T:%.2lf(N))"
                  ,uav3_command.roll, uav3_command.pitch, uav3_command.thrust);
 
 }
@@ -118,7 +116,7 @@ void control_cb(const mav_msgs::Distribution::ConstPtr& msg){
 int main(int argc, char **argv)
 {
 
-  ros::init(argc, argv, "uav_command_transformer");
+  ros::init(argc, argv, "uav_command_distributor");
 
   ros::NodeHandle n;
   // subscribe uav orientation
@@ -130,9 +128,9 @@ int main(int argc, char **argv)
   ros::Subscriber controller_sub = n.subscribe<mav_msgs::Distribution>("/center/uav_distribution",3,control_cb);
   
   // publish uav command for xbee
-  ros::Publisher uav1_command_pub = n.advertise<auto_flight::command>("pc_to_pixhawk_1", 1);
-  ros::Publisher uav2_command_pub = n.advertise<auto_flight::command>("pc_to_pixhawk_2", 1);
-  ros::Publisher uav3_command_pub = n.advertise<auto_flight::command>("pc_to_pixhawk_3", 1);
+  ros::Publisher uav1_command_pub = n.advertise<auto_flight::command>("transport_command_1", 1);
+  ros::Publisher uav2_command_pub = n.advertise<auto_flight::command>("transport_command_2", 1);
+  ros::Publisher uav3_command_pub = n.advertise<auto_flight::command>("transport_command_3", 1);
 
   ros::Rate loop_rate(120);
 
