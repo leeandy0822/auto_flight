@@ -35,9 +35,10 @@ int main(int argc ,char **argv){
 	std::string port_name;
 	std::string node_name;
 
-	nh.getParam("/uav1/xbee_transfrom/port_name", port_name);      
+	nh.getParam("/uav1/xbee_transform/port_name", port_name);      
 	nh.getParam("/uav1/xbee_transfrom/node_name", node_name);
 
+	port_name = "/dev/ttyUSB0";
 	cout << port_name << endl;
 	
 	cout << "main start" << endl;           
