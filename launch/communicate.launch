@@ -5,8 +5,8 @@
     <node name="xbee_sender" pkg="auto_flight" type="xbee_sender" output="screen">
     </node>
 
-    <node name="total_to_uav" pkg="auto_flight" type="xbee_sender" output="screen">
-    </node>
+    <!-- <node name="total_to_uav" pkg="auto_flight" type="xbee_sender" output="screen">
+    </node> -->
 
 <!-- send command  -->
 <group ns="uav1">

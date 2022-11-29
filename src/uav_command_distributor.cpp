@@ -39,7 +39,21 @@ uav_R uav3_R;
 
 // payload control output
 mav_msgs::Distribution uav_pub_output;
+int count = 0 ; 
 
+
+void print_1hz(){
+  // std::cout << "UAV1 Orientation : " << uav1_R.roll << " "<< uav1_R.pitch << " "<< uav1_R.yaw << std::endl;
+  printf("UAV1_command=(R:%.2lf(rad), P:%.2lf(rad), T:%.2lf(N))\n"
+                 ,uav1_command.roll, uav1_command.pitch, uav1_command.thrust);
+  // std::cout << "UAV2 Orientation : " << uav2_R.roll << " "<< uav2_R.pitch << " "<< uav2_R.yaw << std::endl;
+  printf( "UAV2_command=(R:%.2lf(rad), P:%.2lf(rad), T:%.2lf(N))\n"
+                 ,uav2_command.roll, uav2_command.pitch, uav2_command.thrust);
+  // std::cout << "UAV3 Orientation : " << uav3_R.roll << " "<< uav3_R.pitch << " "<< uav3_R.yaw << std::endl;
+  printf( "UAV3_command=(R:%.2lf(rad), P:%.2lf(rad), T:%.2lf(N))\n"
+                 ,uav3_command.roll, uav3_command.pitch, uav3_command.thrust);        
+  count = 0 ; 
+}
 
 void command_maker(geometry_msgs::Vector3& uav_command_raw, auto_flight::command& uav_command,
  uav_R uav_orientation){
@@ -75,9 +89,10 @@ void uav1_cb(const geometry_msgs::PoseStamped::ConstPtr& msg){
   eigen_quat.toRotationMatrix();
   
   command_maker(uav1_command_raw, uav1_command , uav1_R);
-  std::cout << "UAV1 RPY angle (rad) : " << uav1_R.roll << " "<< uav1_R.pitch << " "<< uav1_R.yaw << std::endl;
-  ROS_INFO( "UAV1_command=(R:%.2lf(rad), P:%.2lf(rad), T:%.2lf(N))"
-                 ,uav1_command.roll, uav1_command.pitch, uav1_command.thrust);
+  count++;
+  if(count == 60){
+    print_1hz();
+  };
 
 }
 
@@ -89,11 +104,7 @@ void uav2_cb(const geometry_msgs::PoseStamped::ConstPtr& msg){
   Eigen::Quaterniond eigen_quat;
   tf::quaternionTFToEigen(Q, eigen_quat);
   eigen_quat.toRotationMatrix();
-  std::cout << "UAV2 RPY angle (rad) : " << uav2_R.roll << " "<< uav2_R.pitch << " "<< uav2_R.yaw << std::endl;
   command_maker(uav2_command_raw, uav2_command , uav2_R);
-  
-  ROS_INFO( "UAV2_command=(R:%.2lf(rad), P:%.2lf(rad), T:%.2lf(N))"
-                 ,uav2_command.roll, uav2_command.pitch, uav2_command.thrust);
 
 }
 
@@ -106,10 +117,7 @@ void uav3_cb(const geometry_msgs::PoseStamped::ConstPtr& msg){
   Eigen::Quaterniond eigen_quat;
   tf::quaternionTFToEigen(Q, eigen_quat);
   eigen_quat.toRotationMatrix();
-  std::cout << "UAV3 RPY angle (rad) : " << uav3_R.roll << " "<< uav3_R.pitch << " "<< uav3_R.yaw << std::endl;
   command_maker(uav3_command_raw, uav3_command , uav3_R);
-  ROS_INFO( "UAV3_command=(R:%.2lf(rad), P:%.2lf(rad), T:%.2lf(N))"
-                 ,uav3_command.roll, uav3_command.pitch, uav3_command.thrust);
 
 }
 

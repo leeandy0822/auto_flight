@@ -16,6 +16,8 @@
 using namespace std;
 
 int serial_fd = 0 ; 
+int hz_count = 0 ; 
+
 void serial_init(char *port_name, int baudrate)
 {
 	//open the port
@@ -99,6 +101,7 @@ void send_pose_to_serial(int tracker_id, float pos_x_m, float pos_y_m, float pos
 {
 	static double last_execute_time = 0;
 	static double current_time;
+	hz_count++;
 
 	current_time = ros::Time::now().toSec();
 
@@ -106,12 +109,14 @@ void send_pose_to_serial(int tracker_id, float pos_x_m, float pos_y_m, float pos
 
 	last_execute_time = current_time;
 
-	ROS_INFO("UAV:%d,[%.2fHz] id:%d,position=(x:%.2lf,y:%.2lf,z:%.2lf), "
-                 "orientation=(x:%.1lf,y:%.1lf,z:%.1lf,w:%.1lf),"
-				 "command = (roll:%.1f,pitch:%.1f,thrust:%.1f)",
-        	 serial_fd, real_freq, tracker_id,
-                 pos_x_m * 10.0f, pos_y_m * 10.0f, pos_z_m * 10.0f,
+	if(hz_count == 100){
+		ROS_INFO("UAV:%d,[%.2fHz]"
+                 "(x:%.2lf,y:%.2lf,z:%.2lf,w:%.2lf),"
+				 "command = (roll:%.2f,pitch:%.2f,thrust:%.2f)",
+        	     tracker_id, real_freq,
                  quat_x, quat_y, quat_z, quat_w, roll, pitch, thrust);
+		hz_count = 0 ; 
+	}
 
 	/*+------------+----------+----+---+---+---+----+----+----+----+---------------------------------+
     *| start byte | checksum | id | x | y | z | qx | qy | qz | qw | roll | pitch | thrust | end byte |

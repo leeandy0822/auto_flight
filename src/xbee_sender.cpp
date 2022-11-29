@@ -106,18 +106,6 @@ int main(int argc, char **argv)
   transport_msg_2.tracker_id = 2;
   transport_msg_3.tracker_id = 3;
 
-  // // degree
-  // transport_msg_1.roll = 0;
-  // transport_msg_2.roll = 0;
-  // transport_msg_3.roll = 0;
-  // // degree
-  // transport_msg_1.pitch = 0;
-  // transport_msg_2.pitch = 0;
-  // transport_msg_3.pitch = 0;
-  // // newton
-  // transport_msg_1.thrust = 5;
-  // transport_msg_2.thrust = 5;
-  // transport_msg_3.thrust = 5;
 
   while (ros::ok())
   {

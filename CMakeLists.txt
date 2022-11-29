@@ -250,10 +250,10 @@ target_link_libraries(xbee_sender PUBLIC
 )
 add_dependencies(xbee_sender ${catkin_EXPORTED_TARGETS})
 
-add_executable(total_to_uav
-  src/total_to_uav.cpp
+add_executable(uav_command_distributor
+  src/uav_command_distributor.cpp
 )
-target_link_libraries(total_to_uav PUBLIC
+target_link_libraries(uav_command_distributor PUBLIC
   ${catkin_LIBRARIES}
 )
-add_dependencies(total_to_uav ${catkin_EXPORTED_TARGETS})
+add_dependencies(uav_command_distributor ${catkin_EXPORTED_TARGETS})
