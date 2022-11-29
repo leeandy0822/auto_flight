@@ -16,7 +16,7 @@
     </node>
 </group>
 
-<group ns="uav2">
+<!-- <group ns="uav2">
     <node name="xbee_transform" pkg="auto_flight" type="controller_2" output="screen">
         <param name="port_name" value="/dev/ttyUSB1" />
         <param name="node_name" value="/pc_to_pixhawk_2" />
@@ -28,6 +28,6 @@
         <param name="port_name" value="/dev/ttyUSB2" />
         <param name="node_name" value="/pc_to_pixhawk_3" />
     </node>
-</group>
+</group> -->
 
 </launch>

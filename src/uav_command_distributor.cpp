@@ -57,7 +57,7 @@ void print_1hz(){
 
 void command_maker(geometry_msgs::Vector3& uav_command_raw, auto_flight::command& uav_command,
  uav_R uav_orientation){
-  float uav_mass = 0.7;
+  float uav_mass = 0.5;
   Eigen::Vector3d g;
   g << 0, 0, 9.81;
   Eigen::Vector3d self_weight;
