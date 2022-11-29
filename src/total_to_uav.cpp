@@ -43,9 +43,16 @@ mav_msgs::Distribution uav_pub_output;
 
 void command_maker(geometry_msgs::Vector3& uav_command_raw, auto_flight::command& uav_command,
  uav_R uav_orientation){
+  float uav_mass = 0.7;
+  Eigen::Vector3d g;
+  g << 0, 0, 9.81;
+  Eigen::Vector3d self_weight;
+  self_weight = g*uav_mass;
+
   // get f scalar
   Eigen::Vector3d temp;
   temp << uav_command_raw.x , uav_command_raw.y, uav_command_raw.z;
+  temp = temp + self_weight;
   double f_norm = sqrt(temp(0)*temp(0) + temp(1)*temp(1) + temp(2)*temp(2));
   // get yaw angle rotation matrix
   Eigen::AngleAxisd init_rotation_z((float)uav_orientation.yaw, Eigen::Vector3d::UnitZ());

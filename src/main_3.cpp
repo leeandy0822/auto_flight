@@ -40,7 +40,9 @@ int main(int argc ,char **argv){
 
 	cout << port_name << endl;
 	port_name = "/dev/ttyUSB2";
-	cout << "main start" << endl;           
+	node_name = "/pc_to_pixhawk_3";
+	cout << port_name << endl;
+	cout << node_name << endl;       
 
 	char port_name_arr[port_name.length() + 1]; 
 	strcpy(port_name_arr, port_name.c_str()); 

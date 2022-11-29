@@ -39,8 +39,9 @@ int main(int argc ,char **argv){
 	nh.getParam("/uav1/xbee_transfrom/node_name", node_name);
 
 	port_name = "/dev/ttyUSB0";
+	node_name = "/pc_to_pixhawk_1";
 	cout << port_name << endl;
-	
+	cout << node_name << endl;
 	cout << "main start" << endl;           
 
 	char port_name_arr[port_name.length() + 1]; 
