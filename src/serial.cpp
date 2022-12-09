@@ -10,7 +10,7 @@
 // for check
 #define NCRL_LINK_CHECKSUM_INIT_VAL 19
 // pc -> px4
-#define NCRL_LINK_SERIAL_MSG_SIZE 44
+#define NCRL_LINK_SERIAL_MSG_SIZE 32
 #define DRONE_ID 1
 
 using namespace std;
@@ -97,7 +97,7 @@ static uint8_t generate_ncrl_link_checksum_byte(uint8_t *payload, int payload_co
 // Combination of Optitrack and command 
 
 void send_pose_to_serial(int tracker_id, float pos_x_m, float pos_y_m, float pos_z_m,
-			 float quat_x, float quat_y, float quat_z, float quat_w, float roll, float pitch, float thrust)
+			 float quat_x, float quat_y, float quat_z, float quat_w)
 {
 	static double last_execute_time = 0;
 	static double current_time;
@@ -111,10 +111,12 @@ void send_pose_to_serial(int tracker_id, float pos_x_m, float pos_y_m, float pos
 
 	if(hz_count == 100){
 		ROS_INFO("UAV:%d,[%.2fHz]"
-                 "(x:%.2lf,y:%.2lf,z:%.2lf,w:%.2lf),"
-				 "command = (roll:%.2f,pitch:%.2f,thrust:%.2f)",
+				 "(pos_x:%.2lf, pos_y:%.2lf, pos_z:%.2lf)"
+                 "(x:%.2lf,y:%.2lf,z:%.2lf,w:%.2lf),",
         	     tracker_id, real_freq,
-                 quat_x, quat_y, quat_z, quat_w, roll, pitch, thrust);
+				 pos_x_m, pos_y_m, pos_z_m,
+                 quat_x, quat_y, quat_z, quat_w);
+
 		hz_count = 0 ; 
 	}
 
@@ -145,12 +147,6 @@ void send_pose_to_serial(int tracker_id, float pos_x_m, float pos_y_m, float pos
 	memcpy(msg_buf + msg_pos, &quat_z, sizeof(float));
 	msg_pos += sizeof(float);
 	memcpy(msg_buf + msg_pos, &quat_w, sizeof(float));
-	msg_pos += sizeof(float);
-	memcpy(msg_buf + msg_pos, &roll, sizeof(float));
-	msg_pos += sizeof(float);
-	memcpy(msg_buf + msg_pos, &pitch, sizeof(float));
-	msg_pos += sizeof(float);
-	memcpy(msg_buf + msg_pos, &thrust, sizeof(float));
 	msg_pos += sizeof(float);
     msg_buf[msg_pos] = '+'; //end byte
 	msg_pos += sizeof(uint8_t);

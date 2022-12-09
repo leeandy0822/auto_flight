@@ -215,32 +215,32 @@ add_executable(controller_1
   src/main_1.cpp
 )
 
-add_executable(controller_2
-  src/thread/main_thread.cpp
-  src/serial.cpp
-  src/main_2.cpp
-)
+# add_executable(controller_2
+#   src/thread/main_thread.cpp
+#   src/serial.cpp
+#   src/main_2.cpp
+# )
 
-add_executable(controller_3
-  src/thread/main_thread.cpp
-  src/serial.cpp
-  src/main_3.cpp
-)
+# add_executable(controller_3
+#   src/thread/main_thread.cpp
+#   src/serial.cpp
+#   src/main_3.cpp
+# )
 
 
 target_link_libraries(controller_1 PUBLIC
   ${catkin_LIBRARIES}
 )
 
-target_link_libraries(controller_2 PUBLIC
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(controller_3 PUBLIC
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(controller_2 PUBLIC
+#   ${catkin_LIBRARIES}
+# )
+# target_link_libraries(controller_3 PUBLIC
+#   ${catkin_LIBRARIES}
+# )
 add_dependencies(controller_1 ${catkin_EXPORTED_TARGETS})
-add_dependencies(controller_2 ${catkin_EXPORTED_TARGETS})
-add_dependencies(controller_3 ${catkin_EXPORTED_TARGETS})
+# add_dependencies(controller_2 ${catkin_EXPORTED_TARGETS})
+# add_dependencies(controller_3 ${catkin_EXPORTED_TARGETS})
 
 add_executable(xbee_sender
   src/xbee_sender.cpp

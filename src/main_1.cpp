@@ -60,15 +60,11 @@ int main(int argc ,char **argv){
 	tx_data.qy = 0;
 	tx_data.qz = 0;
 	tx_data.qw = -1;
-	tx_data.roll = 0.1;
-	tx_data.pitch = 0.01;	
-	tx_data.thrust = 0.3;	
 
 	while(ros::ok()){
 		
 		send_pose_to_serial(tx_data.tracker_id, tx_data.px , tx_data.py, tx_data.pz,
-			 tx_data.qx, tx_data.qy, tx_data.qz, tx_data.qw, \
-			 tx_data.roll, tx_data.pitch, tx_data.thrust);
+			 tx_data.qx, tx_data.qy, tx_data.qz, tx_data.qw);
 
 		loop_rate.sleep();
 		ros::spinOnce();
